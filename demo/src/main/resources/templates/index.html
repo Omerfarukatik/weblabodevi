@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <th:block th:head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    </th:block>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Management</h1>
+
+        <!-- Add New Product Form -->
+        <form id="addProductForm" th:action="@{/newProduct}" method="post">
+            <h2>Add New Product</h2>
+            <input type="text" id="model" name="model" placeholder="Model" class="form-control" required>
+            <input type="text" id="marka" name="marka" placeholder="Brand" class="form-control" required>
+            <input type="number" id="fiyat" name="fiyat" placeholder="Price" class="form-control" required>
+            <input type="number" id="adet" name="adet" placeholder="Quantity" class="form-control" required>
+            <button type="submit" class="btn btn-primary mt-2">Add Product</button>
+        </form>
+
+        <!-- Product List -->
+        <div id="productList">
+            <h2>Product List</h2>
+            <div th:each="product : ${ProductList}" class="product-item">
+                <p><strong th:text="${product.model}"></strong> (<span th:text="${product.marka}"></span>) - $<span th:text="${product.fiyat}"></span> x <span th:text="${product.adet}"></span></p>
+                <!-- Update button -->
+                <button th:onclick="'updateProduct(' + ${product.prodID} + ')'" class="btn btn-warning btn-sm">Update</button>
+                <!-- Delete button -->
+                <form th:action="@{/delProduct/{prodID}(prodID=${product.prodID})}" method="get" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript functions to manage the product list
+
+        // Update product functionality
+        function updateProduct(id) {
+            const newModel = prompt("Enter new model:");
+            const newMarka = prompt("Enter new brand:");
+            const newFiyat = prompt("Enter new price:");
+            const newAdet = prompt("Enter new quantity:");
+
+            const updatedProduct = {
+                model: newModel, 
+                marka: newMarka, 
+                fiyat: parseFloat(newFiyat), 
+                adet: parseInt(newAdet)
+            };
+
+            fetch(`/uptProduct/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedProduct)
+            })
+            .then(response => response.json())
+            .then(() => {
+                location.reload(); // Reload to reflect changes
+            });
+        }
+
+        // Delete product functionality
+        function deleteProduct(id) {
+            fetch(`/delProduct/${id}`, {
+                method: 'GET'
+            })
+            .then(() => {
+                location.reload(); // Reload to reflect changes
+            });
+        }
+    </script>
+</body>
+</html>
+""
